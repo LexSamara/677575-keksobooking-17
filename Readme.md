@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Алексей Еремин](https://up.htmlacademy.ru/javascript/17/user/677575).
-* Наставник: `Неизвестно`.
+* Наставник: `Дмитрий Лебедев`.
 
 ---
 
