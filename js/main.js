@@ -3,14 +3,22 @@
 var moksObjectArray = [];
 var offerTypeArray = ['palace', 'flat', 'house', 'bungalo'];
 var map = document.querySelector('.map');
-// var mapHeight = parseInt((window.getComputedStyle(map).height), 10);
-// console.dir('Ширина: ' + mapHeight);
+var MOKS_OBJECT_NUMBERS = 8;
+var PLACES_NUMBERS = 4;
+var X_WINDOW_MIN = 0;
+var X_WINDOW_MAX = 1200;
+var Y_WINDOW_MIN = 130;
+var Y_WINDOW_MAX = 630;
 
-// console.log(map);
+var pinsTemplate = document.querySelector('#pin')
+    .content
+    .querySelector('button');
+
+var mapPins = document.querySelector('.map__pins');
 
 // Возвращает случайное место
 var getRandomPlace = function (placesArray) {
-  return (placesArray[Math.floor(Math.random() * 4)]);
+  return (placesArray[Math.floor(Math.random() * PLACES_NUMBERS)]);
 };
 
 // Возвращает случайное целое в заданном диапазоне
@@ -18,7 +26,8 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-for (var i = 0; i < 8; i++) {
+// Создает Моки
+for (var i = 0; i < MOKS_OBJECT_NUMBERS; i++) {
   moksObjectArray [i] = {
     author: {
       avatar: 'img/avatars/user0' + (i + 1) + '.png'
@@ -27,21 +36,16 @@ for (var i = 0; i < 8; i++) {
       type: getRandomPlace(offerTypeArray)
     },
     location: {
-      x: getRandomInt(0, 1200),
-      y: getRandomInt(130, 630)
+      x: getRandomInt(X_WINDOW_MIN, X_WINDOW_MAX),
+      y: getRandomInt(Y_WINDOW_MIN, Y_WINDOW_MAX)
     }
   };
 }
 
 map.classList.remove('map--faded');
 
-var pinsTemplate = document.querySelector('#pin')
-    .content
-    .querySelector('button');
-
-var mapPins = document.querySelector('.map__pins');
-
-for (i = 0; i < 8; i++) {
+// Отрисовка сгенерированных DOM-элементов в блок .map__pins
+for (i = 0; i < MOKS_OBJECT_NUMBERS; i++) {
   var pinElement = pinsTemplate.cloneNode(true);
   pinElement.style.left = moksObjectArray[i].location.x + 'px';
   pinElement.style.top = moksObjectArray[i].location.y + 'px';
@@ -49,5 +53,3 @@ for (i = 0; i < 8; i++) {
   pinElement.alt = moksObjectArray[i].offer.type;
   mapPins.appendChild(pinElement);
 }
-
-
