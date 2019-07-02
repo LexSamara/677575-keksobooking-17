@@ -20,6 +20,8 @@ var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var filtersForm = document.querySelector('.map__filters');
 var mapPinMain = document.querySelector('.map__pin--main');
 var address = adForm.querySelector('#address');
+var MAP_PIN_MAIN_WIDTH = 50;
+var MAP_PIN_MAIN_HEIGHT = 70;
 
 // Возвращает случайное место
 var getRandomPlace = function (placesArray) {
@@ -105,8 +107,8 @@ mapPinMain.addEventListener('click', mapPinMainClickHandler);
 
 // Функция определения координаты основной метки
 var getPinMainCoords = function () {
-  var xPinCoord = parseInt(mapPinMain.style.left, 10) + 20;
-  var yPinCoord = parseInt(mapPinMain.style.top, 10) + 22;
+  var xPinCoord = parseInt(mapPinMain.style.left, 10) + MAP_PIN_MAIN_WIDTH / 2;
+  var yPinCoord = parseInt(mapPinMain.style.top, 10) + MAP_PIN_MAIN_HEIGHT;
   return (xPinCoord + ', ' + yPinCoord);
 };
 
