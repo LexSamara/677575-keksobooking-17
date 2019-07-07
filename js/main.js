@@ -20,6 +20,14 @@ var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var filtersForm = document.querySelector('.map__filters');
 var mapPinMain = document.querySelector('.map__pin--main');
 var address = adForm.querySelector('#address');
+var title = adForm.querySelector('#title');
+var price = adForm.querySelector('#price');
+var place = adForm.querySelector('#type');
+var timein = adForm.querySelector('#timein');
+var timeinOptions = timein.querySelectorAll('option');
+var timeout = adForm.querySelector('#timeout');
+var timeoutOptions = timeout.querySelectorAll('option');
+
 var MAP_PIN_MAIN_WIDTH = 50;
 var MAP_PIN_MAIN_HEIGHT = 70;
 
@@ -114,3 +122,91 @@ var getPinMainCoords = function () {
 
 // Определение координат метки после нажатия
 mapPinMain.addEventListener('mouseup', mapPinMainMouseupHandler);
+
+// Установка адреса сервера для отправки формы
+adForm.setAttribute('action', 'https://js.dump.academy/keksobooking');
+
+// Добавление аттрибута required обязательным полям формы
+title.setAttribute('required', '');
+price.setAttribute('required', '');
+
+// Установка ограничений на поля формы
+title.setAttribute('minlength', '30');
+title.setAttribute('maxlength', '100');
+price.setAttribute('type', 'number');
+price.setAttribute('max', '1000000');
+address.setAttribute('readonly', '');
+
+// Установка мининальной цены
+
+// Обработчик опций выбора места
+var setMinPriceHandler = function (placeType) {
+  var priceValue = 0;
+  if (placeType === 'bungalo') {
+    priceValue = 0;
+  } else
+  if (placeType === 'flat') {
+    priceValue = 1000;
+  } else
+  if (placeType === 'house') {
+    priceValue = 5000;
+  } else
+  if (placeType === 'palace') {
+    priceValue = 10000;
+  }
+  price.setAttribute('min', priceValue);
+  price.setAttribute('placeholder', priceValue);
+};
+
+// Синхронизация с временем выезда
+var setTime = function (time) {
+  if (time === '12:00') {
+    timeinOptions[0].setAttribute('selected', '');
+    timeinOptions[1].removeAttribute('selected', '');
+    timeinOptions[2].removeAttribute('selected', '');
+    timeoutOptions[0].setAttribute('selected', '');
+    timeoutOptions[1].removeAttribute('selected', '');
+    timeoutOptions[2].removeAttribute('selected', '');
+  } else
+  if (time === '13:00') {
+    timeinOptions[1].setAttribute('selected', '');
+    timeinOptions[0].removeAttribute('selected', '');
+    timeinOptions[2].removeAttribute('selected', '');
+    timeoutOptions[1].setAttribute('selected', '');
+    timeoutOptions[0].removeAttribute('selected', '');
+    timeoutOptions[2].removeAttribute('selected', '');
+  } else
+  if (time === '14:00') {
+    timeinOptions[2].setAttribute('selected', '');
+    timeinOptions[0].removeAttribute('selected', '');
+    timeinOptions[1].removeAttribute('selected', '');
+    timeoutOptions[2].setAttribute('selected', '');
+    timeoutOptions[0].removeAttribute('selected', '');
+    timeoutOptions[1].removeAttribute('selected', '');
+  }
+};
+
+// Обработчик время заезда
+var setTimeinHandler = function (time) {
+  setTime(time);
+};
+
+// Обработчик время выезда
+var setTimeoutHandler = function (time) {
+  setTime(time);
+};
+
+// Переключатель места проживания
+place.addEventListener('change', function (evt) {
+  setMinPriceHandler(evt.target.value);
+});
+
+// Переключатель времени заезда
+timein.addEventListener('change', function (evt) {
+  setTimeinHandler(evt.target.value);
+});
+
+// Переключатель времени выезда
+timeout.addEventListener('change', function (evt) {
+  setTimeoutHandler(evt.target.value);
+});
