@@ -137,8 +137,6 @@ price.setAttribute('type', 'number');
 price.setAttribute('max', '1000000');
 address.setAttribute('readonly', '');
 
-// Установка мининальной цены
-
 // Обработчик опций выбора места
 var setMinPriceHandler = function (placeType) {
   var priceValue = 0;
@@ -158,42 +156,45 @@ var setMinPriceHandler = function (placeType) {
   price.setAttribute('placeholder', priceValue);
 };
 
-// Синхронизация с временем выезда
-var setTime = function (time) {
-  if (time === '12:00') {
-    timeinOptions[0].setAttribute('selected', '');
-    timeinOptions[1].removeAttribute('selected', '');
-    timeinOptions[2].removeAttribute('selected', '');
-    timeoutOptions[0].setAttribute('selected', '');
-    timeoutOptions[1].removeAttribute('selected', '');
-    timeoutOptions[2].removeAttribute('selected', '');
-  } else
-  if (time === '13:00') {
-    timeinOptions[1].setAttribute('selected', '');
-    timeinOptions[0].removeAttribute('selected', '');
-    timeinOptions[2].removeAttribute('selected', '');
-    timeoutOptions[1].setAttribute('selected', '');
-    timeoutOptions[0].removeAttribute('selected', '');
-    timeoutOptions[2].removeAttribute('selected', '');
-  } else
-  if (time === '14:00') {
-    timeinOptions[2].setAttribute('selected', '');
-    timeinOptions[0].removeAttribute('selected', '');
-    timeinOptions[1].removeAttribute('selected', '');
-    timeoutOptions[2].setAttribute('selected', '');
-    timeoutOptions[0].removeAttribute('selected', '');
-    timeoutOptions[1].removeAttribute('selected', '');
+var getAttr = function () {
+  for (var i = 0; i < timeinOptions.length; i++) {
+    // console.log(timeinOptions[i].value, timeoutOptions[i].value);
+    // console.log(i, timeinOptions[i].hasAttribute('selected'), timeoutOptions[i].hasAttribute('selected'));
   }
-};
+}
 
-// Обработчик время заезда
-var setTimeinHandler = function (time) {
-  setTime(time);
-};
-
-// Обработчик время выезда
-var setTimeoutHandler = function (time) {
-  setTime(time);
+// Обработчик время заезда + синхронизация полей option
+var setTimeHandler = function (time) {
+  for (var j = 0; j < timeinOptions.length; j++) {
+    timeinOptions[j].removeAttribute('selected', '');
+    timeoutOptions[j].removeAttribute('selected', '');
+  }
+  for (var i = 0; i < timeinOptions.length; i++) {
+    if (time === '12:00' && i === 0) {
+      timeinOptions[i].setAttribute('selected', '');
+      timeoutOptions[i].setAttribute('selected', '');
+      // console.log(time);
+      // getAttr();
+    } else
+    if (time === '13:00' && i === 1) {
+      timeinOptions[i].setAttribute('selected', '');
+      timeoutOptions[i].setAttribute('selected', '');
+      // console.log(time);
+      // getAttr();
+    } else
+    if (time === '14:00' && i === 2) {
+      timeinOptions[i].setAttribute('selected', '');
+      timeoutOptions[i].setAttribute('selected', '');
+      // console.log(time);
+      // getAttr();
+    }
+  }
+  timein.removeEventListener('change', function (evt) {
+    setTimeHandler(evt.target.value);
+  });
+  timeout.removeEventListener('change', function (evt) {
+    setTimeHandler(evt.target.value);
+  });
 };
 
 // Переключатель места проживания
@@ -203,10 +204,10 @@ place.addEventListener('change', function (evt) {
 
 // Переключатель времени заезда
 timein.addEventListener('change', function (evt) {
-  setTimeinHandler(evt.target.value);
+  setTimeHandler(evt.target.value);
 });
 
 // Переключатель времени выезда
 timeout.addEventListener('change', function (evt) {
-  setTimeoutHandler(evt.target.value);
+  setTimeHandler(evt.target.value);
 });
