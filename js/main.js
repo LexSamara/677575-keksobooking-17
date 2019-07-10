@@ -20,16 +20,17 @@ var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var filtersForm = document.querySelector('.map__filters');
 var mapPinMain = document.querySelector('.map__pin--main');
 var address = adForm.querySelector('#address');
-var title = adForm.querySelector('#title');
 var price = adForm.querySelector('#price');
 var place = adForm.querySelector('#type');
 var timein = adForm.querySelector('#timein');
-var timeinOptions = timein.querySelectorAll('option');
 var timeout = adForm.querySelector('#timeout');
-var timeoutOptions = timeout.querySelectorAll('option');
 
 var MAP_PIN_MAIN_WIDTH = 50;
 var MAP_PIN_MAIN_HEIGHT = 70;
+var PRICE_OF_BUNGALO = 0;
+var PRICE_OF_FLAT = 1000;
+var PRICE_OF_HOUSE = 5000;
+var PRICE_OF_PALACE = 10000;
 
 // Возвращает случайное место
 var getRandomPlace = function (placesArray) {
@@ -123,78 +124,31 @@ var getPinMainCoords = function () {
 // Определение координат метки после нажатия
 mapPinMain.addEventListener('mouseup', mapPinMainMouseupHandler);
 
-// Установка адреса сервера для отправки формы
-adForm.setAttribute('action', 'https://js.dump.academy/keksobooking');
-
-// Добавление аттрибута required обязательным полям формы
-title.setAttribute('required', '');
-price.setAttribute('required', '');
-
-// Установка ограничений на поля формы
-title.setAttribute('minlength', '30');
-title.setAttribute('maxlength', '100');
-price.setAttribute('type', 'number');
-price.setAttribute('max', '1000000');
-address.setAttribute('readonly', '');
-
 // Обработчик опций выбора места
 var setMinPriceHandler = function (placeType) {
   var priceValue = 0;
-  if (placeType === 'bungalo') {
-    priceValue = 0;
-  } else
-  if (placeType === 'flat') {
-    priceValue = 1000;
-  } else
-  if (placeType === 'house') {
-    priceValue = 5000;
-  } else
-  if (placeType === 'palace') {
-    priceValue = 10000;
+  switch (placeType) {
+    case ('bungalo'):
+      priceValue = PRICE_OF_BUNGALO;
+      break;
+    case ('flat'):
+      priceValue = PRICE_OF_FLAT;
+      break;
+    case ('house'):
+      priceValue = PRICE_OF_HOUSE;
+      break;
+    case ('palace'):
+      priceValue = PRICE_OF_PALACE;
+      break;
   }
   price.setAttribute('min', priceValue);
   price.setAttribute('placeholder', priceValue);
 };
 
-var getAttr = function () {
-  for (var i = 0; i < timeinOptions.length; i++) {
-    // console.log(timeinOptions[i].value, timeoutOptions[i].value);
-    // console.log(i, timeinOptions[i].hasAttribute('selected'), timeoutOptions[i].hasAttribute('selected'));
-  }
-}
-
 // Обработчик время заезда + синхронизация полей option
-var setTimeHandler = function (time) {
-  for (var j = 0; j < timeinOptions.length; j++) {
-    timeinOptions[j].removeAttribute('selected', '');
-    timeoutOptions[j].removeAttribute('selected', '');
-  }
-  for (var i = 0; i < timeinOptions.length; i++) {
-    if (time === '12:00' && i === 0) {
-      timeinOptions[i].setAttribute('selected', '');
-      timeoutOptions[i].setAttribute('selected', '');
-      // console.log(time);
-      // getAttr();
-    } else
-    if (time === '13:00' && i === 1) {
-      timeinOptions[i].setAttribute('selected', '');
-      timeoutOptions[i].setAttribute('selected', '');
-      // console.log(time);
-      // getAttr();
-    } else
-    if (time === '14:00' && i === 2) {
-      timeinOptions[i].setAttribute('selected', '');
-      timeoutOptions[i].setAttribute('selected', '');
-      // console.log(time);
-      // getAttr();
-    }
-  }
-  timein.removeEventListener('change', function (evt) {
-    setTimeHandler(evt.target.value);
-  });
-  timeout.removeEventListener('change', function (evt) {
-    setTimeHandler(evt.target.value);
-  });
+var setTimeHandler = function (evt) {
+  var select = evt.target === timein ? timeout : timein;
+  select.value = evt.target.value;
 };
 
 // Переключатель места проживания
@@ -203,11 +157,7 @@ place.addEventListener('change', function (evt) {
 });
 
 // Переключатель времени заезда
-timein.addEventListener('change', function (evt) {
-  setTimeHandler(evt.target.value);
-});
+timein.addEventListener('change', setTimeHandler);
 
 // Переключатель времени выезда
-timeout.addEventListener('change', function (evt) {
-  setTimeHandler(evt.target.value);
-});
+timeout.addEventListener('change', setTimeHandler);
