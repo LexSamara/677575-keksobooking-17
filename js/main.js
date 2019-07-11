@@ -24,6 +24,7 @@ var price = adForm.querySelector('#price');
 var place = adForm.querySelector('#type');
 var timein = adForm.querySelector('#timein');
 var timeout = adForm.querySelector('#timeout');
+var placesTypeArray = ['bungalo', 'flat', 'house', 'palace'];
 
 var MAP_PIN_MAIN_WIDTH = 50;
 var MAP_PIN_MAIN_HEIGHT = 70;
@@ -128,16 +129,16 @@ mapPinMain.addEventListener('mouseup', mapPinMainMouseupHandler);
 var setMinPriceHandler = function (placeType) {
   var priceValue = 0;
   switch (placeType) {
-    case ('bungalo'):
+    case (placesTypeArray[0]):
       priceValue = PRICE_OF_BUNGALO;
       break;
-    case ('flat'):
+    case (placesTypeArray[1]):
       priceValue = PRICE_OF_FLAT;
       break;
-    case ('house'):
+    case (placesTypeArray[2]):
       priceValue = PRICE_OF_HOUSE;
       break;
-    case ('palace'):
+    case (placesTypeArray[3]):
       priceValue = PRICE_OF_PALACE;
       break;
   }
@@ -147,7 +148,7 @@ var setMinPriceHandler = function (placeType) {
 
 // Обработчик время заезда + синхронизация полей option
 var setTimeHandler = function (evt) {
-  var select = evt.target === timein ? timeout : timein;
+  var select = (evt.target === timein) ? timeout : timein;
   select.value = evt.target.value;
 };
 
