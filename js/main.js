@@ -20,8 +20,18 @@ var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var filtersForm = document.querySelector('.map__filters');
 var mapPinMain = document.querySelector('.map__pin--main');
 var address = adForm.querySelector('#address');
+var price = adForm.querySelector('#price');
+var place = adForm.querySelector('#type');
+var timein = adForm.querySelector('#timein');
+var timeout = adForm.querySelector('#timeout');
+var placesTypeArray = ['bungalo', 'flat', 'house', 'palace'];
+
 var MAP_PIN_MAIN_WIDTH = 50;
 var MAP_PIN_MAIN_HEIGHT = 70;
+var PRICE_OF_BUNGALO = 0;
+var PRICE_OF_FLAT = 1000;
+var PRICE_OF_HOUSE = 5000;
+var PRICE_OF_PALACE = 10000;
 
 // Возвращает случайное место
 var getRandomPlace = function (placesArray) {
@@ -114,3 +124,41 @@ var getPinMainCoords = function () {
 
 // Определение координат метки после нажатия
 mapPinMain.addEventListener('mouseup', mapPinMainMouseupHandler);
+
+// Обработчик опций выбора места
+var setMinPriceHandler = function (placeType) {
+  var priceValue = 0;
+  switch (placeType) {
+    case (placesTypeArray[0]):
+      priceValue = PRICE_OF_BUNGALO;
+      break;
+    case (placesTypeArray[1]):
+      priceValue = PRICE_OF_FLAT;
+      break;
+    case (placesTypeArray[2]):
+      priceValue = PRICE_OF_HOUSE;
+      break;
+    case (placesTypeArray[3]):
+      priceValue = PRICE_OF_PALACE;
+      break;
+  }
+  price.setAttribute('min', priceValue);
+  price.setAttribute('placeholder', priceValue);
+};
+
+// Обработчик время заезда + синхронизация полей option
+var setTimeHandler = function (evt) {
+  var select = (evt.target === timein) ? timeout : timein;
+  select.value = evt.target.value;
+};
+
+// Переключатель места проживания
+place.addEventListener('change', function (evt) {
+  setMinPriceHandler(evt.target.value);
+});
+
+// Переключатель времени заезда
+timein.addEventListener('change', setTimeHandler);
+
+// Переключатель времени выезда
+timeout.addEventListener('change', setTimeHandler);
