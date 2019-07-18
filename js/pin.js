@@ -29,14 +29,13 @@
     return (xPinCoord + ', ' + yPinCoord);
   };
 
-  // Отрисовка сгенерированных DOM-элементов в блок .map__pins
-  var renderPins = function (pinsNum) {
-    for (var i = 0; i < pinsNum; i++) {
+  var renderPins = function () { // form.js
+    for (var i = 0; i < window.ServerData.length; i++) {
       var pinElement = pinsTemplate.cloneNode(true);
-      pinElement.style.left = window.moksObjectArray[i].location.x + 'px';
-      pinElement.style.top = window.moksObjectArray[i].location.y + 'px';
-      pinElement.querySelector('img').src = window.moksObjectArray[i].author.avatar;
-      pinElement.alt = window.moksObjectArray[i].offer.type;
+      pinElement.style.left = window.ServerData[i].location.x + 'px';
+      pinElement.style.top = window.ServerData[i].location.y + 'px';
+      pinElement.querySelector('img').src = window.ServerData[i].author.avatar;
+      pinElement.alt = window.ServerData[i].offer.type;
       mapPins.appendChild(pinElement);
     }
   };
@@ -103,4 +102,6 @@
     document.addEventListener('mouseup', mouseUpHandler);
   });
   window.renderPins = renderPins;
+
+
 })();
