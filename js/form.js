@@ -15,9 +15,7 @@
   var place = adForm.querySelector('#type'); // Переключатель места проживания
   var timein = adForm.querySelector('#timein'); // setTimeHandler, Переключатель времени заезда
   var timeout = adForm.querySelector('#timeout'); // setTimeHandler, Переключатель времени выезда
-
   var filtersForm = document.querySelector('.map__filters'); // ableFiltersForm, Дезактивация формы с фильтрами .map__filters
-
 
   // Функция активации формы объявления
   var ableAdForm = function () {
@@ -49,7 +47,7 @@
     adForm.classList.remove('ad-form--disabled');
     ableAdForm();
     ableFiltersForm();
-    window.renderPins(window.MOKS_OBJECT_NUMBERS);
+    window.renderPins(); // pin.js
   };
 
   // Обработчик опций выбора места

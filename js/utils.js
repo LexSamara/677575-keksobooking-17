@@ -1,6 +1,5 @@
 'use strict';
 
-
 (function () {
   // Возвращает случайное место
   var getRandomPlace = function (placesArray) {
