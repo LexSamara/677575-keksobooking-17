@@ -29,13 +29,25 @@
     return (xPinCoord + ', ' + yPinCoord);
   };
 
+
   var renderPins = function () { // form.js
-    for (var i = 0; i < window.ServerData.length; i++) {
+    var serverDataArray = window.load(window.successHandler, window.errorHandler);
+    console.log(serverDataArray);
+
+    for (var i = 0; i < serverDataArray.length; i++) {
       var pinElement = pinsTemplate.cloneNode(true);
-      pinElement.style.left = window.ServerData[i].location.x + 'px';
-      pinElement.style.top = window.ServerData[i].location.y + 'px';
-      pinElement.querySelector('img').src = window.ServerData[i].author.avatar;
-      pinElement.alt = window.ServerData[i].offer.type;
+
+
+      pinElement.style.left = serverDataArray[i].location.x + 'px';
+      pinElement.style.top = serverDataArray[i].location.y + 'px';
+      pinElement.querySelector('img').src = serverDataArray[i].author.avatar;
+      pinElement.alt = serverDataArray[i].offer.type;
+
+      // pinElement.style.left = window.ServerData[i].location.x + 'px';
+      // pinElement.style.top = window.ServerData[i].location.y + 'px';
+      // pinElement.querySelector('img').src = window.ServerData[i].author.avatar;
+      // pinElement.alt = window.ServerData[i].offer.type;
+
       mapPins.appendChild(pinElement);
     }
   };
@@ -44,6 +56,7 @@
   mapPinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     window.activateForms();
+    window.load(successHandler, errorHandler);
 
     var startCoords = {
       x: evt.clientX,

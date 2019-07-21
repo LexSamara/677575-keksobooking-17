@@ -41,6 +41,9 @@
     filtersForm[i].setAttribute('disabled', '');
   }
 
+
+
+
   // Активация форм
   var activateForms = function () {
     map.classList.remove('map--faded');
