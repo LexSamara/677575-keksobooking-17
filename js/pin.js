@@ -4,6 +4,7 @@
   var MAP_PIN_MAIN_WIDTH = 50; // mouseMoveHandler, getPinMainCoords
   var MAP_PIN_MAIN_HEIGHT = 70; // mouseMoveHandler, getPinMainCoords
   var MAP_TOP_BORDER = 130; // mouseMoveHandler
+  var MAX_RENDER_PINS = 5;
 
   var adForm = document.querySelector('.ad-form'); // activateForms
   var address = adForm.querySelector('#address'); // setAddress
@@ -16,6 +17,10 @@
   var filtersForm = document.querySelector('.map__filters'); // ableFiltersForm, Дезактивация формы с фильтрами .map__filters
   var filterFormStyle = getComputedStyle(filtersForm);
   var filterFormStyleHeight = parseInt(filterFormStyle.height, 10); // mouseMoveHandler
+  var housingTypeFilter = document.querySelector('#housing-type');
+
+  var responseCopy = [];
+  var housingTypeFilterArray;
 
   // Вносит коорднаты метки в поле адреса
   var setAddress = function () {
@@ -23,34 +28,106 @@
   };
 
   // Возвращает координаты острого конца метки
-  var getPinMainCoords = function () {
+  var getPinMainCoords = function (isMap) {
     var xPinCoord = parseInt(mapPinMain.style.left, 10) + MAP_PIN_MAIN_WIDTH / 2;
     var yPinCoord = parseInt(mapPinMain.style.top, 10) + MAP_PIN_MAIN_HEIGHT;
-    return (xPinCoord + ', ' + yPinCoord);
+    if (isMap) {return (xPinCoord + ', ' + yPinCoord)}
+      else {
+        return {
+          x: xPinCoord,
+          y: yPinCoord
+        }
+      }
+
   };
 
+  var getDistance = function (xp, yp, xc, yc) {
+    var dx = xc - xp;
+    var dy = yc - yp;
+    return Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+  };
 
-  var renderPins = function () { // form.js
-    var serverDataArray = window.load(window.successHandler, window.errorHandler);
-    console.log(serverDataArray);
-
-    for (var i = 0; i < serverDataArray.length; i++) {
+  var renderPins = function (response) {
+    for (var i = 0; i < response.length; i++) {
       var pinElement = pinsTemplate.cloneNode(true);
-
-
-      pinElement.style.left = serverDataArray[i].location.x + 'px';
-      pinElement.style.top = serverDataArray[i].location.y + 'px';
-      pinElement.querySelector('img').src = serverDataArray[i].author.avatar;
-      pinElement.alt = serverDataArray[i].offer.type;
-
-      // pinElement.style.left = window.ServerData[i].location.x + 'px';
-      // pinElement.style.top = window.ServerData[i].location.y + 'px';
-      // pinElement.querySelector('img').src = window.ServerData[i].author.avatar;
-      // pinElement.alt = window.ServerData[i].offer.type;
-
+      pinElement.style.left = response[i].location.x + 'px';
+      pinElement.style.top = response[i].location.y + 'px';
+      pinElement.querySelector('img').src = response[i].author.avatar;
+      pinElement.alt = response[i].offer.type;
+      pinElement.classList.add('newPin');
+      console.log(pinElement.className);
       mapPins.appendChild(pinElement);
     }
   };
+
+  var removePins = function () {
+    var newPins = document.querySelectorAll('.newPin');
+    console.log(newPins);
+    for (var i = 0; i < newPins.length; i++) {
+      mapPins.removeChild(newPins[i]);
+    }
+  };
+
+  // Обработчик фильтра жилья
+  var housingTypeFilterHandler = function(evt) {
+    removePins();
+    housingTypeFilterArray = responseCopy;
+
+    if (evt.target.value !== 'any') {
+      var housingFiltered = housingTypeFilterArray.filter(function (houseType) {
+        return houseType.offer.type === evt.target.value;
+      });
+      if (housingFiltered.length !== 0) renderPins(housingFiltered);
+    } else {
+      renderPins(responseCopy);
+    }
+
+    // console.log('Filtered for: ', housingFiltered[0].offer.type, housingFiltered);
+
+    // switch (housingFiltered.length) {
+    //   case 0:
+    //   case
+    // }
+
+
+  };
+
+  // Фильтр жилья
+  housingTypeFilter.addEventListener('change', housingTypeFilterHandler);
+
+  // var updatePins = function() {
+  //   var housingType = document.querySelector('#housing-type');
+
+  // };
+
+  // Обработчик запроса json
+  var successHandler = function (response) {
+    if (Array.isArray(response) && response.length > 0) {
+      responseCopy = response.slice();
+      renderPins(response);
+    } else {
+      console.warn('Неверный тип данных или пустой массив', response);
+    }
+  };
+
+  // Обработчик запроса json
+  var errorHandler = function () {
+    var errorTamplate = document.querySelector('#error') // renderPins
+      .content
+      .querySelector('div');
+    var loadErrorElement = errorTamplate.cloneNode(true);
+    var buttonError = loadErrorElement.querySelector('button');
+
+    document.body.appendChild(loadErrorElement);
+
+    buttonError.addEventListener('click', function () {
+      loadErrorElement.classList.add('hidden');
+    });
+  };
+
+  // var loadPins = function () { // form.js
+  //   window.load(successHandler, errorHandler);
+  // };
 
   // Перемещение метки
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -114,7 +191,7 @@
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   });
-  window.renderPins = renderPins;
 
+  // window.loadPins = loadPins;
 
 })();

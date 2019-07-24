@@ -17,6 +17,7 @@
   var timeout = adForm.querySelector('#timeout'); // setTimeHandler, Переключатель времени выезда
   var filtersForm = document.querySelector('.map__filters'); // ableFiltersForm, Дезактивация формы с фильтрами .map__filters
 
+
   // Функция активации формы объявления
   var ableAdForm = function () {
     for (var i = 0; i < adFormFieldsets.length; i++) {
@@ -41,16 +42,14 @@
     filtersForm[i].setAttribute('disabled', '');
   }
 
-
-
-
   // Активация форм
   var activateForms = function () {
     map.classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
     ableAdForm();
     ableFiltersForm();
-    window.renderPins(); // pin.js
+    // window.loadPins(); // pin.js
+    // window.updatePins();
   };
 
   // Обработчик опций выбора места
