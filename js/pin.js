@@ -4,7 +4,6 @@
   var MAP_PIN_MAIN_WIDTH = 50; // mouseMoveHandler, getPinMainCoords
   var MAP_PIN_MAIN_HEIGHT = 70; // mouseMoveHandler, getPinMainCoords
   var MAP_TOP_BORDER = 130; // mouseMoveHandler
-  var MAX_RENDER_PINS = 5;
 
   var adForm = document.querySelector('.ad-form'); // activateForms
   var address = adForm.querySelector('#address'); // setAddress
@@ -31,21 +30,22 @@
   var getPinMainCoords = function (isMap) {
     var xPinCoord = parseInt(mapPinMain.style.left, 10) + MAP_PIN_MAIN_WIDTH / 2;
     var yPinCoord = parseInt(mapPinMain.style.top, 10) + MAP_PIN_MAIN_HEIGHT;
-    if (isMap) {return (xPinCoord + ', ' + yPinCoord)}
-      else {
-        return {
-          x: xPinCoord,
-          y: yPinCoord
-        }
-      }
+    if (isMap) {
+      return (xPinCoord + ', ' + yPinCoord);
+    } else {
+      return {
+        x: xPinCoord,
+        y: yPinCoord
+      };
+    }
 
   };
 
-  var getDistance = function (xp, yp, xc, yc) {
-    var dx = xc - xp;
-    var dy = yc - yp;
-    return Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
-  };
+  // var getDistance = function (xp, yp, xc, yc) {
+  //   var dx = xc - xp;
+  //   var dy = yc - yp;
+  //   return Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+  // };
 
   var renderPins = function (response) {
     for (var i = 0; i < response.length; i++) {
@@ -55,21 +55,19 @@
       pinElement.querySelector('img').src = response[i].author.avatar;
       pinElement.alt = response[i].offer.type;
       pinElement.classList.add('newPin');
-      console.log(pinElement.className);
       mapPins.appendChild(pinElement);
     }
   };
 
   var removePins = function () {
     var newPins = document.querySelectorAll('.newPin');
-    console.log(newPins);
     for (var i = 0; i < newPins.length; i++) {
       mapPins.removeChild(newPins[i]);
     }
   };
 
   // Обработчик фильтра жилья
-  var housingTypeFilterHandler = function(evt) {
+  var housingTypeFilterHandler = function (evt) {
     removePins();
     housingTypeFilterArray = responseCopy;
 
@@ -77,7 +75,9 @@
       var housingFiltered = housingTypeFilterArray.filter(function (houseType) {
         return houseType.offer.type === evt.target.value;
       });
-      if (housingFiltered.length !== 0) renderPins(housingFiltered);
+      if (housingFiltered.length !== 0) {
+        renderPins(housingFiltered);
+      }
     } else {
       renderPins(responseCopy);
     }
@@ -104,9 +104,8 @@
   var successHandler = function (response) {
     if (Array.isArray(response) && response.length > 0) {
       responseCopy = response.slice();
-      renderPins(response);
     } else {
-      console.warn('Неверный тип данных или пустой массив', response);
+      // console.warn('Неверный тип данных или пустой массив', response);
     }
   };
 
