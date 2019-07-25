@@ -32,16 +32,6 @@
     }
   };
 
-  // Дезактивация формы заполнения информации об объявлении .ad-form
-  for (var i = 0; i < adFormFieldsets.length; i++) {
-    adFormFieldsets[i].setAttribute('disabled', '');
-  }
-
-  // Дезактивация формы с фильтрами .map__filters
-  for (i = 0; i < filtersForm.length; i++) {
-    filtersForm[i].setAttribute('disabled', '');
-  }
-
   // Активация форм
   var activateForms = function () {
     map.classList.remove('map--faded');
@@ -64,6 +54,16 @@
     var select = (evt.target === timein) ? timeout : timein;
     select.value = evt.target.value;
   };
+
+  // Дезактивация формы заполнения информации об объявлении .ad-form
+  for (var i = 0; i < adFormFieldsets.length; i++) {
+    adFormFieldsets[i].setAttribute('disabled', '');
+  }
+
+  // Дезактивация формы с фильтрами .map__filters
+  for (i = 0; i < filtersForm.length; i++) {
+    filtersForm[i].setAttribute('disabled', '');
+  }
 
   // Переключатель места проживания
   place.addEventListener('change', function (evt) {

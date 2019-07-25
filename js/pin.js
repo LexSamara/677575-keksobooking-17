@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  var MAP_PIN_MAIN_WIDTH = 50; // mouseMoveHandler, getPinMainCoords
-  var MAP_PIN_MAIN_HEIGHT = 70; // mouseMoveHandler, getPinMainCoords
+  var MAP_PIN_WIDTH = 50; // mouseMoveHandler
+  var MAP_PIN_HEIGHT = 70; // mouseMoveHandler
   var MAP_TOP_BORDER = 130; // mouseMoveHandler
 
   var adForm = document.querySelector('.ad-form'); // activateForms
@@ -12,7 +12,7 @@
       .querySelector('button');
 
   var mapPins = document.querySelector('.map__pins'); // renderPins, mouseMoveHandler
-  var mapPinMain = document.querySelector('.map__pin--main'); // getPinMainCoords, Перемещение метки, mouseMoveHandler
+  var mapPinMain = document.querySelector('.map__pin--main'); // Перемещение метки, mouseMoveHandler
   var filtersForm = document.querySelector('.map__filters'); // ableFiltersForm, Дезактивация формы с фильтрами .map__filters
   var filterFormStyle = getComputedStyle(filtersForm);
   var filterFormStyleHeight = parseInt(filterFormStyle.height, 10); // mouseMoveHandler
@@ -21,41 +21,87 @@
   var responseCopy = [];
   var housingTypeFilterArray;
 
-  // Вносит коорднаты метки в поле адреса
-  var setAddress = function () {
-    address.setAttribute('value', getPinMainCoords());
-  };
-
   // Возвращает координаты острого конца метки
-  var getPinMainCoords = function (isMap) {
-    var xPinCoord = parseInt(mapPinMain.style.left, 10) + MAP_PIN_MAIN_WIDTH / 2;
-    var yPinCoord = parseInt(mapPinMain.style.top, 10) + MAP_PIN_MAIN_HEIGHT;
-    if (isMap) {
+  var getPinCoords = function (pin, isMianPin) {
+    var xPinCoord = parseInt(pin.style.left, 10) + MAP_PIN_WIDTH / 2;
+    var yPinCoord = parseInt(pin.style.top, 10) + MAP_PIN_HEIGHT;
+    // var xPinCoord = pin.location.x;
+    // var yPinCoord = pin.location.y;
+
+    var coords = {
+      x: xPinCoord,
+      y: yPinCoord
+    };
+    if (isMianPin) {
       return (xPinCoord + ', ' + yPinCoord);
     } else {
-      return {
-        x: xPinCoord,
-        y: yPinCoord
-      };
-    }
-
+      return coords;
+      }
   };
 
-  // var getDistance = function (xp, yp, xc, yc) {
-  //   var dx = xc - xp;
-  //   var dy = yc - yp;
-  //   return Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
-  // };
+  // Вносит коорднаты метки в поле адреса
+  var setAddress = function () {
+    address.setAttribute('value', getPinCoords(mapPinMain, true));
+  };
+
+  var getDistance = function (xMainPin, yMainPin, xPin, yPin) {
+    var dx = xMainPin - xPin;
+    var dy = yMainPin - yPin;
+    return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+  };
+
+  var addDistance = function (pin) {
+    var xc = getPinCoords(mapPinMain, false).x;
+    var yc = getPinCoords(mapPinMain, false).y;
+    var dist = getDistance(xc, yc, getPinCoords(pin, false).x, getPinCoords(pin, false).y);
+    pin.distance = dist;
+  };
+
+
+
+// Отрисовка пинов
+// 1. При загрузке - v -все
+// 2. После перемещения
+// 3. После фильтров
 
   var renderPins = function (response) {
-    for (var i = 0; i < response.length; i++) {
+    var renderArray = response;
+    // renderArray.forEach(function(pins) {
+    //   addDistance(pins);
+    // });
+
+    renderArray.forEach(function(pins) {
+      console.log(pins.distance);
+    });
+
+    var resp = response.slice();
+    if (resp.length > 5) {
+      console.log(resp.length);
+      renderArray = resp.sort(function (first, second) {
+        if (first.distance > second.distance) {
+          return 1;
+        } else if (first.distance < second.distance) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+    }
+
+    // console.clear(response.length);
+    // console.log(renderArray.length);
+    for (var i = 0; i < renderArray.length; i++) {
       var pinElement = pinsTemplate.cloneNode(true);
-      pinElement.style.left = response[i].location.x + 'px';
-      pinElement.style.top = response[i].location.y + 'px';
-      pinElement.querySelector('img').src = response[i].author.avatar;
-      pinElement.alt = response[i].offer.type;
+
+      pinElement.style.left = renderArray[i].location.x + 'px';
+      pinElement.style.top = renderArray[i].location.y + 'px';
+      pinElement.querySelector('img').src = renderArray[i].author.avatar;
+      pinElement.alt = renderArray[i].offer.type;
       pinElement.classList.add('newPin');
       mapPins.appendChild(pinElement);
+      addDistance(pinElement);
+
+      console.log(pinElement.distance);
     }
   };
 
@@ -81,31 +127,14 @@
     } else {
       renderPins(responseCopy);
     }
-
-    // console.log('Filtered for: ', housingFiltered[0].offer.type, housingFiltered);
-
-    // switch (housingFiltered.length) {
-    //   case 0:
-    //   case
-    // }
-
-
   };
-
-  // Фильтр жилья
-  housingTypeFilter.addEventListener('change', housingTypeFilterHandler);
-
-  // var updatePins = function() {
-  //   var housingType = document.querySelector('#housing-type');
-
-  // };
 
   // Обработчик запроса json
   var successHandler = function (response) {
     if (Array.isArray(response) && response.length > 0) {
       responseCopy = response.slice();
     } else {
-      // console.warn('Неверный тип данных или пустой массив', response);
+      console.warn('Неверный тип данных или пустой массив', response);
     }
   };
 
@@ -124,15 +153,15 @@
     });
   };
 
-  // var loadPins = function () { // form.js
-  //   window.load(successHandler, errorHandler);
-  // };
+  window.load(successHandler, errorHandler);
+
+  // Фильтр жилья
+  housingTypeFilter.addEventListener('change', housingTypeFilterHandler);
 
   // Перемещение метки
   mapPinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     window.activateForms();
-    window.load(successHandler, errorHandler);
 
     var startCoords = {
       x: evt.clientX,
@@ -174,14 +203,16 @@
       if (pinMargin.left < mapPins.offsetLeft) {
         mapPinMain.style.left = mapPins.offsetLeft + 'px';
       }
-      if (pinMargin.left > mapPins.offsetWidth - MAP_PIN_MAIN_WIDTH) {
-        mapPinMain.style.left = mapPins.offsetWidth - MAP_PIN_MAIN_WIDTH + 'px';
+      if (pinMargin.left > mapPins.offsetWidth - MAP_PIN_WIDTH) {
+        mapPinMain.style.left = mapPins.offsetWidth - MAP_PIN_WIDTH + 'px';
       }
     };
 
     var mouseUpHandler = function (upEvt) {
       upEvt.preventDefault();
       setAddress();
+      removePins();
+      renderPins(responseCopy);
 
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
