@@ -19,7 +19,7 @@
   var housingTypeFilter = document.querySelector('#housing-type');
 
   var responseCopy = [];
-  var housingTypeFilterArray;
+  var housingFiltered = [];
 
   // Возвращает координаты острого конца метки
   var getPinCoords = function (pin, isMianPin) {
@@ -36,7 +36,7 @@
       return (xPinCoord + ', ' + yPinCoord);
     } else {
       return coords;
-      }
+    }
   };
 
   // Вносит коорднаты метки в поле адреса
@@ -53,31 +53,19 @@
   var addDistance = function (pin) {
     var xc = getPinCoords(mapPinMain, false).x;
     var yc = getPinCoords(mapPinMain, false).y;
-    var dist = getDistance(xc, yc, getPinCoords(pin, false).x, getPinCoords(pin, false).y);
+    var dist = getDistance(xc, yc, pin.location.x, pin.location.y);
     pin.distance = dist;
   };
 
-
-
-// Отрисовка пинов
-// 1. При загрузке - v -все
-// 2. После перемещения
-// 3. После фильтров
-
-  var renderPins = function (response) {
-    var renderArray = response;
-    // renderArray.forEach(function(pins) {
-    //   addDistance(pins);
-    // });
-
-    renderArray.forEach(function(pins) {
-      console.log(pins.distance);
+  var getDistanceSort = function (response) {
+    response.forEach(function (pin) {
+      addDistance(pin);
     });
 
-    var resp = response.slice();
-    if (resp.length > 5) {
-      console.log(resp.length);
-      renderArray = resp.sort(function (first, second) {
+    var renderArray = response.slice();
+
+    if (renderArray.length > 5) {
+      var distanceSortArr = renderArray.sort(function (first, second) {
         if (first.distance > second.distance) {
           return 1;
         } else if (first.distance < second.distance) {
@@ -85,23 +73,26 @@
         } else {
           return 0;
         }
-      });
+      })
+      .slice(0, 5);
+    } else {
+      distanceSortArr = renderArray.slice();
     }
+    return distanceSortArr;
+  };
 
-    // console.clear(response.length);
-    // console.log(renderArray.length);
-    for (var i = 0; i < renderArray.length; i++) {
+  var renderPins = function (response) {
+    var distanceSortedArray = getDistanceSort(response);
+
+    for (var i = 0; i < distanceSortedArray.length; i++) {
       var pinElement = pinsTemplate.cloneNode(true);
 
-      pinElement.style.left = renderArray[i].location.x + 'px';
-      pinElement.style.top = renderArray[i].location.y + 'px';
-      pinElement.querySelector('img').src = renderArray[i].author.avatar;
-      pinElement.alt = renderArray[i].offer.type;
+      pinElement.style.left = distanceSortedArray[i].location.x + 'px';
+      pinElement.style.top = distanceSortedArray[i].location.y + 'px';
+      pinElement.querySelector('img').src = distanceSortedArray[i].author.avatar;
+      pinElement.alt = distanceSortedArray[i].offer.type;
       pinElement.classList.add('newPin');
       mapPins.appendChild(pinElement);
-      addDistance(pinElement);
-
-      console.log(pinElement.distance);
     }
   };
 
@@ -115,16 +106,17 @@
   // Обработчик фильтра жилья
   var housingTypeFilterHandler = function (evt) {
     removePins();
-    housingTypeFilterArray = responseCopy;
+    var housingTypeFilterArray = responseCopy.slice();
 
     if (evt.target.value !== 'any') {
-      var housingFiltered = housingTypeFilterArray.filter(function (houseType) {
+      housingFiltered = housingTypeFilterArray.filter(function (houseType) {
         return houseType.offer.type === evt.target.value;
       });
       if (housingFiltered.length !== 0) {
         renderPins(housingFiltered);
       }
     } else {
+      housingFiltered = [];
       renderPins(responseCopy);
     }
   };
@@ -134,7 +126,7 @@
     if (Array.isArray(response) && response.length > 0) {
       responseCopy = response.slice();
     } else {
-      console.warn('Неверный тип данных или пустой массив', response);
+      // console.warn('Неверный тип данных или пустой массив', response);
     }
   };
 
@@ -212,7 +204,11 @@
       upEvt.preventDefault();
       setAddress();
       removePins();
-      renderPins(responseCopy);
+      if (housingFiltered.length > 0) {
+        renderPins(housingFiltered);
+      } else {
+        renderPins(responseCopy);
+      }
 
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
@@ -221,7 +217,4 @@
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   });
-
-  // window.loadPins = loadPins;
-
 })();
