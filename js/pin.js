@@ -128,7 +128,7 @@
     if (Array.isArray(response) && response.length > 0) {
       responseCopy = response.slice();
     } else {
-      console.warn('Неверный тип данных или пустой массив', response);
+      // console.warn('Неверный тип данных или пустой массив', response);
     }
   };
 
