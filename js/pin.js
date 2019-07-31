@@ -11,12 +11,15 @@
       .content
       .querySelector('button');
 
+  var map = document.querySelector('.map');
+  var mapFilters = document.querySelector('.map__filters-container');
   var mapPins = document.querySelector('.map__pins');
   var mapPinMain = document.querySelector('.map__pin--main');
   var filtersForm = document.querySelector('.map__filters');
   var filterFormStyle = getComputedStyle(filtersForm);
   var filterFormStyleHeight = parseInt(filterFormStyle.height, 10);
   var housingTypeFilter = document.querySelector('#housing-type');
+  var cardsArray = [];
 
   var responseCopy = [];
   var housingFiltered = [];
@@ -93,8 +96,11 @@
       pinElement.alt = distanceSortedArray[i].offer.type;
       pinElement.classList.add('newPin');
       fragmentForPins.appendChild(pinElement);
+      // console.log(pinElement);
+
+
     }
-    window.renderCard(fragmentForPins, distanceSortedArray);
+    cardsArray = window.renderCard(distanceSortedArray);
     mapPins.appendChild(fragmentForPins);
   };
 
@@ -203,6 +209,7 @@
     };
 
     var mouseUpHandler = function (upEvt) {
+      var renderedPins;
       upEvt.preventDefault();
       setAddress();
       removePins();
@@ -214,9 +221,48 @@
 
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
+
+      var cardButtonCloseHandler = function (closeButtonEvent) {
+        closeButtonEvent.preventDefault();
+        map.removeChild(map.querySelector('.map__card'));
+      };
+
+      var cardEscCloseHandler = function (escEvent) {
+        if (escEvent.keyCode === 27) {
+          escEvent.preventDefault();
+          map.removeChild(map.querySelector('.map__card'));
+        }
+      };
+
+      // Обработчик отображения корточек
+      var showCardHandler = function (renderedPin, PinIndex) {
+        renderedPin.addEventListener('click', function () {
+          if (map.querySelector('.map__card')) {
+            map.removeChild(map.querySelector('.map__card'));
+          } else {
+            map.insertBefore(cardsArray[PinIndex], mapFilters);
+          }
+
+          var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
+
+          cardCloseButton.addEventListener('click', cardButtonCloseHandler);
+
+          window.addEventListener('keydown', cardEscCloseHandler);
+
+        });
+      };
+
+      renderedPins = mapPins.querySelectorAll('.newPin');
+
+      for (var i = 0; i < renderedPins.length; i++) {
+        showCardHandler(renderedPins[i], i);
+      }
+
     };
 
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   });
+
+
 })();

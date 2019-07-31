@@ -2,9 +2,7 @@
 
 (function () {
 
-  window.renderCard = function (fragment, resp) {
-    var map = document.querySelector('.map');
-    var mapFilters = document.querySelector('.map__filters-container');
+  window.renderCard = function (resp) {
     var cardTemplate = document.querySelector('#card')
       .content
       .querySelector('.map__card');
@@ -39,6 +37,7 @@
       cardElementPhotos.removeChild(cardElementPhotos.querySelector('img'));
     };
 
+    // Наполнение корточек
     for (var i = 0; i < resp.length; i++) {
       var cardElement = cardTemplate.cloneNode(true);
       var cardElementFeatures = cardElement.querySelector('.popup__features');
@@ -63,10 +62,11 @@
       }
 
       renderPhoto(resp[i].offer.photos, cardElement);
+
       cardElementArray[i] = cardElement;
     }
 
-    map.insertBefore(cardElementArray[0], mapFilters);
+    return cardElementArray;
   };
 })();
 
