@@ -1,21 +1,21 @@
 'use strict';
 
 (function () {
-  var MAP_PIN_WIDTH = 50; // mouseMoveHandler
-  var MAP_PIN_HEIGHT = 70; // mouseMoveHandler
-  var MAP_TOP_BORDER = 130; // mouseMoveHandler
+  var MAP_PIN_WIDTH = 50;
+  var MAP_PIN_HEIGHT = 70;
+  var MAP_TOP_BORDER = 130;
 
-  var adForm = document.querySelector('.ad-form'); // activateForms
-  var address = adForm.querySelector('#address'); // setAddress
-  var pinsTemplate = document.querySelector('#pin') // renderPins
+  var adForm = document.querySelector('.ad-form');
+  var address = adForm.querySelector('#address');
+  var pinsTemplate = document.querySelector('#pin')
       .content
       .querySelector('button');
 
-  var mapPins = document.querySelector('.map__pins'); // renderPins, mouseMoveHandler
-  var mapPinMain = document.querySelector('.map__pin--main'); // Перемещение метки, mouseMoveHandler
-  var filtersForm = document.querySelector('.map__filters'); // ableFiltersForm, Дезактивация формы с фильтрами .map__filters
+  var mapPins = document.querySelector('.map__pins');
+  var mapPinMain = document.querySelector('.map__pin--main');
+  var filtersForm = document.querySelector('.map__filters');
   var filterFormStyle = getComputedStyle(filtersForm);
-  var filterFormStyleHeight = parseInt(filterFormStyle.height, 10); // mouseMoveHandler
+  var filterFormStyleHeight = parseInt(filterFormStyle.height, 10);
   var housingTypeFilter = document.querySelector('#housing-type');
 
   var responseCopy = [];
@@ -25,13 +25,11 @@
   var getPinCoords = function (pin, isMianPin) {
     var xPinCoord = parseInt(pin.style.left, 10) + MAP_PIN_WIDTH / 2;
     var yPinCoord = parseInt(pin.style.top, 10) + MAP_PIN_HEIGHT;
-    // var xPinCoord = pin.location.x;
-    // var yPinCoord = pin.location.y;
-
     var coords = {
       x: xPinCoord,
       y: yPinCoord
     };
+
     if (isMianPin) {
       return (xPinCoord + ', ' + yPinCoord);
     } else {
@@ -81,6 +79,8 @@
     return distanceSortArr;
   };
 
+  var fragmentForPins = document.createDocumentFragment();
+
   var renderPins = function (response) {
     var distanceSortedArray = getDistanceSort(response);
 
@@ -92,8 +92,10 @@
       pinElement.querySelector('img').src = distanceSortedArray[i].author.avatar;
       pinElement.alt = distanceSortedArray[i].offer.type;
       pinElement.classList.add('newPin');
-      mapPins.appendChild(pinElement);
+      fragmentForPins.appendChild(pinElement);
     }
+    window.renderCard(fragmentForPins, distanceSortedArray);
+    mapPins.appendChild(fragmentForPins);
   };
 
   var removePins = function () {
@@ -132,7 +134,7 @@
 
   // Обработчик запроса json
   var errorHandler = function () {
-    var errorTamplate = document.querySelector('#error') // renderPins
+    var errorTamplate = document.querySelector('#error')
       .content
       .querySelector('div');
     var loadErrorElement = errorTamplate.cloneNode(true);

@@ -38,8 +38,6 @@
     adForm.classList.remove('ad-form--disabled');
     ableAdForm();
     ableFiltersForm();
-    // window.loadPins(); // pin.js
-    // window.updatePins();
   };
 
   // Обработчик опций выбора места
