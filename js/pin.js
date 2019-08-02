@@ -235,13 +235,15 @@
       };
 
       // Обработчик отображения корточек
-      var showCardHandler = function (renderedPin, PinIndex) {
+      var showCardHandler = function (renderedPin, pinIndex) {
+
         renderedPin.addEventListener('click', function () {
           if (map.querySelector('.map__card')) {
             map.removeChild(map.querySelector('.map__card'));
-          } else {
-            map.insertBefore(cardsArray[PinIndex], mapFilters);
           }
+
+          map.insertBefore(cardsArray[pinIndex], mapFilters);
+
 
           var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
 

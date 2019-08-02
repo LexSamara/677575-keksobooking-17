@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var PRICES = { // setMinPriceHandler
+  var PRICES = {
     bungalo: 0,
     flat: 1000,
     house: 5000,
@@ -16,7 +16,8 @@
   var timein = adForm.querySelector('#timein'); // setTimeHandler, Переключатель времени заезда
   var timeout = adForm.querySelector('#timeout'); // setTimeHandler, Переключатель времени выезда
   var filtersForm = document.querySelector('.map__filters'); // ableFiltersForm, Дезактивация формы с фильтрами .map__filters
-
+  var roomNumber = adForm.querySelector('#room_number');
+  var capacityCount = adForm.querySelector('#capacity');
 
   // Функция активации формы объявления
   var ableAdForm = function () {
@@ -73,6 +74,43 @@
 
   // Переключатель времени выезда
   timeout.addEventListener('change', setTimeHandler);
+
+  var roomCapacityHandler = function (evt) {
+    var select = (evt.target === roomNumber) ? roomNumber : capacityCount;
+
+    var doCompare = function (rooms, capacity) {
+      var roo = parseInt(rooms.value, 10);
+      var cap = parseInt(capacity.value, 10);
+      if (((roo >= cap) && cap !== 0 && roo !== 100) || (roo === 100 && cap === 0)) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    var doValidity = function (el, res) {
+      if (!res) {
+        el.setCustomValidity('Error');
+      } else {
+        el.setCustomValidity('');
+      }
+    };
+
+    var compareResult = '';
+    switch (select.id) {
+      case 'room_number':
+        compareResult = doCompare(select, capacityCount);
+        doValidity(select, compareResult);
+        break;
+      case 'capacity':
+        compareResult = doCompare(roomNumber, select);
+        doValidity(select, compareResult);
+        break;
+    }
+  };
+
+  roomNumber.addEventListener('change', roomCapacityHandler);
+  capacityCount.addEventListener('change', roomCapacityHandler);
 
   window.activateForms = activateForms;
 })();
