@@ -41,7 +41,7 @@
   };
 
   // Вносит коорднаты метки в поле адреса
-  var setAddress = function () {
+  window.setAddress = function () {
     address.setAttribute('value', getPinCoords(mapPinMain, true));
   };
 
@@ -104,7 +104,7 @@
     mapPins.appendChild(fragmentForPins);
   };
 
-  var removePins = function () {
+  window.removePins = function () {
     var newPins = document.querySelectorAll('.newPin');
     for (var i = 0; i < newPins.length; i++) {
       mapPins.removeChild(newPins[i]);
@@ -113,7 +113,7 @@
 
   // Обработчик фильтра жилья
   var housingTypeFilterHandler = function (evt) {
-    removePins();
+    window.removePins();
     var housingTypeFilterArray = responseCopy.slice();
 
     if (evt.target.value !== 'any') {
@@ -211,8 +211,8 @@
     var mouseUpHandler = function (upEvt) {
       var renderedPins;
       upEvt.preventDefault();
-      setAddress();
-      removePins();
+      window.setAddress();
+      window.removePins();
       if (housingFiltered.length > 0) {
         renderPins(housingFiltered);
       } else {
@@ -222,40 +222,41 @@
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
 
-      var cardButtonCloseHandler = function (closeButtonEvent) {
-        closeButtonEvent.preventDefault();
-        map.removeChild(map.querySelector('.map__card'));
+
+      window.removeCard = function () {
+        if (map.querySelector('.map__card')) {
+          map.removeChild(map.querySelector('.map__card'));
+        }
       };
 
+      // Закрытия карточки по кнопке
+      var cardButtonCloseHandler = function (closeButtonEvent) {
+        closeButtonEvent.preventDefault();
+        window.removeCard();
+      };
+
+      // Закрытия карточки по Esc
       var cardEscCloseHandler = function (escEvent) {
         if (escEvent.keyCode === 27) {
           escEvent.preventDefault();
-          map.removeChild(map.querySelector('.map__card'));
+          window.removeCard();
         }
       };
 
       // Обработчик отображения корточек
       var showCardHandler = function (renderedPin, pinIndex) {
-
         renderedPin.addEventListener('click', function () {
-          if (map.querySelector('.map__card')) {
-            map.removeChild(map.querySelector('.map__card'));
-          }
-
+          window.removeCard();
           map.insertBefore(cardsArray[pinIndex], mapFilters);
-
-
           var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
-
           cardCloseButton.addEventListener('click', cardButtonCloseHandler);
-
           window.addEventListener('keydown', cardEscCloseHandler);
-
         });
       };
 
       renderedPins = mapPins.querySelectorAll('.newPin');
 
+      // Наполнение карточек
       for (var i = 0; i < renderedPins.length; i++) {
         showCardHandler(renderedPins[i], i);
       }
