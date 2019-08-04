@@ -52,6 +52,7 @@
 
       renderType(resp[i].offer.type, cardElement);
 
+      // Рендеринг фич
       if (resp[i].offer.features.length === 0) {
         cardElementFeatures.classList.add('hidden');
       } else {
