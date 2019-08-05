@@ -21,6 +21,7 @@
   var housingTypeFilter = document.querySelector('#housing-type');
   var cardsArray = [];
 
+  var renderedPins;
   var responseCopy = [];
   var housingFiltered = [];
 
@@ -96,12 +97,11 @@
       pinElement.alt = distanceSortedArray[i].offer.type;
       pinElement.classList.add('newPin');
       fragmentForPins.appendChild(pinElement);
-      // console.log(pinElement);
-
-
     }
-    cardsArray = window.renderCard(distanceSortedArray);
     mapPins.appendChild(fragmentForPins);
+    renderedPins = mapPins.querySelectorAll('.newPin');
+    cardsArray = window.renderCard(distanceSortedArray);
+    doCardFilling(renderedPins);
   };
 
   window.removePins = function () {
@@ -209,7 +209,7 @@
     };
 
     var mouseUpHandler = function (upEvt) {
-      var renderedPins;
+      // var renderedPins;
       upEvt.preventDefault();
       window.setAddress();
       window.removePins();
@@ -221,51 +221,49 @@
 
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
-
-
-      window.removeCard = function () {
-        if (map.querySelector('.map__card')) {
-          map.removeChild(map.querySelector('.map__card'));
-        }
-      };
-
-      // Закрытия карточки по кнопке
-      var cardButtonCloseHandler = function (closeButtonEvent) {
-        closeButtonEvent.preventDefault();
-        window.removeCard();
-      };
-
-      // Закрытия карточки по Esc
-      var cardEscCloseHandler = function (escEvent) {
-        if (escEvent.keyCode === 27) {
-          escEvent.preventDefault();
-          window.removeCard();
-        }
-      };
-
-      // Обработчик отображения корточек
-      var showCardHandler = function (renderedPin, pinIndex) {
-        renderedPin.addEventListener('click', function () {
-          window.removeCard();
-          map.insertBefore(cardsArray[pinIndex], mapFilters);
-          var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
-          cardCloseButton.addEventListener('click', cardButtonCloseHandler);
-          window.addEventListener('keydown', cardEscCloseHandler);
-        });
-      };
-
-      renderedPins = mapPins.querySelectorAll('.newPin');
-
-      // Наполнение карточек
-      for (var i = 0; i < renderedPins.length; i++) {
-        showCardHandler(renderedPins[i], i);
-      }
-
     };
 
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   });
+
+  window.removeCard = function () {
+    if (map.querySelector('.map__card')) {
+      map.removeChild(map.querySelector('.map__card'));
+    }
+  };
+
+  // Закрытия карточки по кнопке
+  var cardButtonCloseHandler = function (closeButtonEvent) {
+    closeButtonEvent.preventDefault();
+    window.removeCard();
+  };
+
+  // Закрытия карточки по Esc
+  var cardEscCloseHandler = function (escEvent) {
+    if (escEvent.keyCode === 27) {
+      escEvent.preventDefault();
+      window.removeCard();
+    }
+  };
+
+  // Обработчик отображения корточек
+  var showCardHandler = function (renderedPin, pinIndex) {
+    renderedPin.addEventListener('click', function () {
+      window.removeCard();
+      map.insertBefore(cardsArray[pinIndex], mapFilters);
+      var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
+      cardCloseButton.addEventListener('click', cardButtonCloseHandler);
+      window.addEventListener('keydown', cardEscCloseHandler);
+    });
+  };
+
+  // Наполнение карточек
+  var doCardFilling = function (pins) {
+    for (var i = 0; i < pins.length; i++) {
+      showCardHandler(pins[i], i);
+    }
+  };
 
 
 })();
