@@ -18,12 +18,11 @@
   var filtersForm = document.querySelector('.map__filters');
   var filterFormStyle = getComputedStyle(filtersForm);
   var filterFormStyleHeight = parseInt(filterFormStyle.height, 10);
-  var housingTypeFilter = document.querySelector('#housing-type');
   var cardsArray = [];
 
   var renderedPins;
-  var responseCopy = [];
-  var housingFiltered = [];
+  window.responseCopy = [];
+
 
   // Возвращает координаты острого конца метки
   var getPinCoords = function (pin, isMianPin) {
@@ -85,7 +84,7 @@
 
   var fragmentForPins = document.createDocumentFragment();
 
-  var renderPins = function (response) {
+  window.renderPins = function (response) {
     var distanceSortedArray = getDistanceSort(response);
 
     for (var i = 0; i < distanceSortedArray.length; i++) {
@@ -111,28 +110,10 @@
     }
   };
 
-  // Обработчик фильтра жилья
-  var housingTypeFilterHandler = function (evt) {
-    window.removePins();
-    var housingTypeFilterArray = responseCopy.slice();
-
-    if (evt.target.value !== 'any') {
-      housingFiltered = housingTypeFilterArray.filter(function (houseType) {
-        return houseType.offer.type === evt.target.value;
-      });
-      if (housingFiltered.length !== 0) {
-        renderPins(housingFiltered);
-      }
-    } else {
-      housingFiltered = [];
-      renderPins(responseCopy);
-    }
-  };
-
   // Обработчик запроса json
   var successHandler = function (response) {
     if (Array.isArray(response) && response.length > 0) {
-      responseCopy = response.slice();
+      window.responseCopy = response.slice();
     } else {
       // console.warn('Неверный тип данных или пустой массив', response);
     }
@@ -154,9 +135,6 @@
   };
 
   window.load(successHandler, errorHandler);
-
-  // Фильтр жилья
-  housingTypeFilter.addEventListener('change', housingTypeFilterHandler);
 
   // Перемещение метки
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -213,10 +191,10 @@
       upEvt.preventDefault();
       window.setAddress();
       window.removePins();
-      if (housingFiltered.length > 0) {
-        renderPins(housingFiltered);
+      if (window.responseFiltered.length > 0) {
+        window.renderPins(window.responseFiltered);
       } else {
-        renderPins(responseCopy);
+        window.renderPins(window.responseCopy);
       }
 
       document.removeEventListener('mousemove', mouseMoveHandler);
