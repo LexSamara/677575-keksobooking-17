@@ -181,11 +181,8 @@
 
   // Рендер окна ошибки при отправке формы
   var renderErrorFormMessage = function () {
-
     var buttonError = errorMassageElement.querySelector('button');
-
     main.appendChild(errorMassageElement);
-
     buttonError.addEventListener('click', function () {
       main.removeChild(errorMassageElement);
     });
@@ -195,7 +192,6 @@
     });
 
     document.addEventListener('keydown', errorMassageEscHandler);
-
   };
 
   // Отправка формы объявления
