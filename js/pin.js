@@ -18,11 +18,11 @@
   var filtersForm = document.querySelector('.map__filters');
   var filterFormStyle = getComputedStyle(filtersForm);
   var filterFormStyleHeight = parseInt(filterFormStyle.height, 10);
-  var housingTypeFilter = document.querySelector('#housing-type');
   var cardsArray = [];
 
-  var responseCopy = [];
-  var housingFiltered = [];
+  var renderedPins;
+  window.responseCopy = [];
+
 
   // Возвращает координаты острого конца метки
   var getPinCoords = function (pin, isMianPin) {
@@ -84,7 +84,7 @@
 
   var fragmentForPins = document.createDocumentFragment();
 
-  var renderPins = function (response) {
+  window.renderPins = function (response) {
     var distanceSortedArray = getDistanceSort(response);
 
     for (var i = 0; i < distanceSortedArray.length; i++) {
@@ -96,12 +96,11 @@
       pinElement.alt = distanceSortedArray[i].offer.type;
       pinElement.classList.add('newPin');
       fragmentForPins.appendChild(pinElement);
-      // console.log(pinElement);
-
-
     }
-    cardsArray = window.renderCard(distanceSortedArray);
     mapPins.appendChild(fragmentForPins);
+    renderedPins = mapPins.querySelectorAll('.newPin');
+    cardsArray = window.renderCard(distanceSortedArray);
+    doCardFilling(renderedPins);
   };
 
   window.removePins = function () {
@@ -111,28 +110,10 @@
     }
   };
 
-  // Обработчик фильтра жилья
-  var housingTypeFilterHandler = function (evt) {
-    window.removePins();
-    var housingTypeFilterArray = responseCopy.slice();
-
-    if (evt.target.value !== 'any') {
-      housingFiltered = housingTypeFilterArray.filter(function (houseType) {
-        return houseType.offer.type === evt.target.value;
-      });
-      if (housingFiltered.length !== 0) {
-        renderPins(housingFiltered);
-      }
-    } else {
-      housingFiltered = [];
-      renderPins(responseCopy);
-    }
-  };
-
   // Обработчик запроса json
   var successHandler = function (response) {
     if (Array.isArray(response) && response.length > 0) {
-      responseCopy = response.slice();
+      window.responseCopy = response.slice();
     } else {
       // console.warn('Неверный тип данных или пустой массив', response);
     }
@@ -154,9 +135,6 @@
   };
 
   window.load(successHandler, errorHandler);
-
-  // Фильтр жилья
-  housingTypeFilter.addEventListener('change', housingTypeFilterHandler);
 
   // Перемещение метки
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -209,63 +187,60 @@
     };
 
     var mouseUpHandler = function (upEvt) {
-      var renderedPins;
       upEvt.preventDefault();
       window.setAddress();
       window.removePins();
-      if (housingFiltered.length > 0) {
-        renderPins(housingFiltered);
+      if (window.filteredPins.length > 0) {
+        window.renderPins(window.filteredPins);
       } else {
-        renderPins(responseCopy);
+        window.renderPins(window.responseCopy);
       }
 
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
-
-
-      window.removeCard = function () {
-        if (map.querySelector('.map__card')) {
-          map.removeChild(map.querySelector('.map__card'));
-        }
-      };
-
-      // Закрытия карточки по кнопке
-      var cardButtonCloseHandler = function (closeButtonEvent) {
-        closeButtonEvent.preventDefault();
-        window.removeCard();
-      };
-
-      // Закрытия карточки по Esc
-      var cardEscCloseHandler = function (escEvent) {
-        if (escEvent.keyCode === 27) {
-          escEvent.preventDefault();
-          window.removeCard();
-        }
-      };
-
-      // Обработчик отображения корточек
-      var showCardHandler = function (renderedPin, pinIndex) {
-        renderedPin.addEventListener('click', function () {
-          window.removeCard();
-          map.insertBefore(cardsArray[pinIndex], mapFilters);
-          var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
-          cardCloseButton.addEventListener('click', cardButtonCloseHandler);
-          window.addEventListener('keydown', cardEscCloseHandler);
-        });
-      };
-
-      renderedPins = mapPins.querySelectorAll('.newPin');
-
-      // Наполнение карточек
-      for (var i = 0; i < renderedPins.length; i++) {
-        showCardHandler(renderedPins[i], i);
-      }
-
     };
 
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   });
+
+  window.removeCard = function () {
+    if (map.querySelector('.map__card')) {
+      map.removeChild(map.querySelector('.map__card'));
+    }
+  };
+
+  // Закрытия карточки по кнопке
+  var cardButtonCloseHandler = function (closeButtonEvent) {
+    closeButtonEvent.preventDefault();
+    window.removeCard();
+  };
+
+  // Закрытия карточки по Esc
+  var cardEscCloseHandler = function (escEvent) {
+    if (escEvent.keyCode === 27) {
+      escEvent.preventDefault();
+      window.removeCard();
+    }
+  };
+
+  // Обработчик отображения корточек
+  var showCardHandler = function (renderedPin, pinIndex) {
+    renderedPin.addEventListener('click', function () {
+      window.removeCard();
+      map.insertBefore(cardsArray[pinIndex], mapFilters);
+      var cardCloseButton = map.querySelector('.map__card').querySelector('.popup__close');
+      cardCloseButton.addEventListener('click', cardButtonCloseHandler);
+      window.addEventListener('keydown', cardEscCloseHandler);
+    });
+  };
+
+  // Наполнение карточек
+  var doCardFilling = function (pins) {
+    for (var i = 0; i < pins.length; i++) {
+      showCardHandler(pins[i], i);
+    }
+  };
 
 
 })();
